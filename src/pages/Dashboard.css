@@ -1,0 +1,20 @@
+/* src/pages/Dashboard.css */
+
+.dashboard-container {
+    font-family: 'Outfit', sans-serif;
+    color: #ffffff;
+  }
+  
+  .dashboard-heading {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    text-shadow: 1px 2px 8px rgba(0, 0, 0, 0.4);
+  }
+  
+  .project-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+  
