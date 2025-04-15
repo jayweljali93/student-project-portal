@@ -13,28 +13,17 @@ const LoginAdmin = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    const authApp = auth;
     const db = getFirestore();
 
     try {
-      // Login user
-      const userCredential = await signInWithEmailAndPassword(
-        authApp,
-        email,
-        password
-      );
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      console.log("UserCredential:", userCredential);
-
-      // Check user role in Firestore
       const userDoc = await getDoc(doc(db, "users", user.uid));
-      console.log("User data:", userDoc.data());
 
       if (userDoc.exists()) {
         const role = userDoc.data().role;
-
         if (role === "admin") {
-          navigate("/admin-dashboard"); // Redirect to admin dashboard
+          navigate("/admin-dashboard");
         } else if (role === "student") {
           navigate("/student-dashboard");
         } else {
@@ -43,26 +32,29 @@ const LoginAdmin = () => {
       }
     } catch (err) {
       setError("❌ Invalid admin credentials.");
-      console.log(err.message);
     }
   };
 
   return (
-    <div className="login-container">
-      <div className="login-image">
-        <img src="/api/placeholder/800/800" alt="Admin Login illustration" />
+    <div className="login-wrapper">
+      <div className="login-left">
+        <h2>Welcome Back</h2>
+        <p>Create your account.<br />It's totally free.</p>
+        {/* <button className="signup-btn">Sign Up</button> */}
       </div>
-      <div className="login-form">
-        <h2>Admin Login</h2>
-        {error && <p className="error">{error}</p>}
+
+      <div className="login-right">
+        <h3>Login</h3>
         <form onSubmit={handleLogin}>
+          <label>Username or email address<span className="required">*</span></label>
           <input
             type="email"
-            placeholder="Enter admin email"
+            placeholder="Username or Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
+          <label>Password<span className="required">*</span></label>
           <input
             type="password"
             placeholder="Password"
@@ -70,8 +62,12 @@ const LoginAdmin = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit">Login</button>
+          <button type="submit" className="signin-btn">Sing In</button>
         </form>
+        <div className="forgot-password">
+          <a href="#">Forgot Password?</a>
+        </div>
+        {error && <p className="error">{error}</p>}
       </div>
     </div>
   );
