@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
-import { auth } from '../firebase';
-import { useNavigate } from 'react-router-dom';
-import '../styles/Login.css';
+import React, { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import "../styles/Login.css";
 
 const LoginAdmin = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
@@ -18,25 +18,31 @@ const LoginAdmin = () => {
 
     try {
       // Login user
-      const userCredential = await signInWithEmailAndPassword(authApp, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        authApp,
+        email,
+        password
+      );
       const user = userCredential.user;
       console.log("UserCredential:", userCredential);
 
       // Check user role in Firestore
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      console.log('User data:', userDoc.data());
-      
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      console.log("User data:", userDoc.data());
+
       if (userDoc.exists()) {
         const role = userDoc.data().role;
 
-        if (role === 'admin') {
-          navigate('/admin-dashboard');  // Redirect to admin dashboard
+        if (role === "admin") {
+          navigate("/admin-dashboard"); // Redirect to admin dashboard
+        } else if (role === "student") {
+          navigate("/student-dashboard");
         } else {
-          setError('❌ You are not authorized as an admin.');
+          setError("❌ You are not authorized as an admin.");
         }
       }
     } catch (err) {
-      setError('❌ Invalid admin credentials.');
+      setError("❌ Invalid admin credentials.");
       console.log(err.message);
     }
   };
