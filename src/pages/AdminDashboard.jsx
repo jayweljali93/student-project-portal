@@ -101,7 +101,7 @@ const AdminDashboard = () => {
 
   const handleLogout = () => {
     signOut(auth).then(() => {
-      navigate('/admin-login');
+      navigate('/');
     }).catch((error) => {
       console.log("Logout error:", error);
     });

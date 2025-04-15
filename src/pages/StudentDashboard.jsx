@@ -61,7 +61,7 @@ const StudentDashboard = () => {
     const checkRole = async () => {
       const user = auth.currentUser;
       if (!user) {
-        navigate('/login');
+        navigate('/');
         return;
       }
 
@@ -89,7 +89,7 @@ const StudentDashboard = () => {
 
   const handleLogout = () => {
     signOut(auth).then(() => {
-      navigate('/login');
+      navigate('/');
     }).catch((error) => {
       console.log("Logout error:", error);
     });
