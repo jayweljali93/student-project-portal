@@ -40,7 +40,7 @@ const LoginAdmin = () => {
       <div className="login-left">
         <h2>Welcome Back</h2>
         <p>Create your account.<br />It's totally free.</p>
-        {/* <button className="signup-btn">Sign Up</button> */}
+        <button className="signup-btn" onClick={() => navigate("/register")}>Sign Up</button>
       </div>
 
       <div className="login-right">
@@ -65,7 +65,7 @@ const LoginAdmin = () => {
           <button type="submit" className="signin-btn">Sing In</button>
         </form>
         <div className="forgot-password">
-          <a href="#">Forgot Password?</a>
+          <a href="#" onClick={() => navigate("/reset-password")}>Forgot Password?</a>
         </div>
         {error && <p className="error">{error}</p>}
       </div>
