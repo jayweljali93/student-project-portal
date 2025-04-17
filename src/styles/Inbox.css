@@ -1,0 +1,70 @@
+.inbox-container {
+    max-width: 600px;
+    margin: auto;
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .chat-box {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+  }
+  
+  .chat-message {
+    margin-bottom: 12px;
+    padding: 10px;
+    border-radius: 6px;
+    max-width: 80%;
+  }
+  
+  .admin-message {
+    background-color: #e1f5fe;
+    margin-left: auto;
+    text-align: right;
+  }
+  
+  .student-message {
+    background-color: #f1f8e9;
+    margin-right: auto;
+  }
+  
+  .message-sender {
+    display: block;
+    font-weight: bold;
+    font-size: 0.85rem;
+    margin-bottom: 4px;
+    color: #555;
+  }
+  
+  .chat-input {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #bbb;
+    border-radius: 5px;
+  }
+  
+  .chat-input button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 0 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+  
+  .chat-input button:hover {
+    background-color: #0056b3;
+  }
+  

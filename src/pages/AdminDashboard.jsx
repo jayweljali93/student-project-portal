@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import AdminChatbox from '../components/AdminChatbox';
 import '../styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
@@ -541,6 +542,7 @@ const AdminDashboard = () => {
           </div>
         </div>
       )}
+      <AdminChatbox />
     </div>
   );
 };

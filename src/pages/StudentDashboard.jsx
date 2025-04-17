@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import StudentChatbox from '../components/StudentChatbox';
 import '../styles/Dashboard.css';
 
 const StudentDashboard = () => {
@@ -319,6 +320,8 @@ const StudentDashboard = () => {
           </div>
         )}
       </div>
+      <StudentChatbox currentStudent={{ name: userName, id: auth.currentUser.uid }} />
+
     </div>
   );
 };
