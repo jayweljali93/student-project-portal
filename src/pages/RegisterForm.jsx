@@ -1,15 +1,22 @@
+// 
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { getFirestore, setDoc, doc } from "firebase/firestore";
 import "../styles/RegisterForm.css";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const db = getFirestore();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -19,10 +26,33 @@ const RegisterForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    // Add validation or API logic here
+    setError("");
+
+    const { name, email, password, confirmPassword } = formData;
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      // Create user in Firebase Authentication
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Save user info and role in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name,
+        email,
+        role: "student", // You can customize this based on user selection
+      });
+
+      navigate("/"); // redirect to login page after successful registration
+    } catch (err) {
+      setError("Registration failed. " + err.message);
+    }
   };
 
   return (
@@ -52,6 +82,8 @@ const RegisterForm = () => {
         <button type="submit" className="submit-button">
           Register
         </button>
+
+        {error && <p className="error">{error}</p>}
 
         <p className="form-footer">
           Already have an account?{" "}
