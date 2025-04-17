@@ -11,9 +11,9 @@
   background: #3ec4f3;
   color: white;
   padding: 40px 30px;
-  display: flex;
+  /* display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: center; */
   clip-path: polygon(0 0, 100% 0, 0 100%, 0% 100%);
 }
 
