@@ -7,6 +7,7 @@ import LoginAdmin from './pages/LoginAdmin';
 import StudentDashboard from './pages/StudentDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import AdminChatPage from './pages/AdminChatPage';
 import ResetPassword from './pages/ResetPassword';
 import RegisterForm from './pages/RegisterForm';
 
@@ -28,6 +29,10 @@ const App = () => {
           path="/admin-dashboard" 
           element={<ProtectedRoute element={<AdminDashboard />} redirectPath="/admin-login" />} 
         />
+        <Route 
+  path="/admin-chat" 
+  element={<ProtectedRoute element={<AdminChatPage />} redirectPath="/admin-login" />} 
+/>
         
         {/* Redirect for any other route */}
         <Route path="*" element={<Navigate to="/" />} />

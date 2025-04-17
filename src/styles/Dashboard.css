@@ -485,3 +485,60 @@
       flex-direction: column;
     }
   }
+  .chat-container {
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    background: #f9f9f9;
+    padding: 16px;
+  }
+  
+  .chat-box {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+  }
+  
+  .message {
+    padding: 8px 12px;
+    margin: 6px 0;
+    border-radius: 20px;
+    width: fit-content;
+    max-width: 70%;
+    word-wrap: break-word;
+  }
+  
+  .message.student {
+    background-color: #d0f0ff;
+    align-self: flex-end;
+    margin-left: auto;
+  }
+  
+  .message.admin {
+    background-color: #ffe0e0;
+    align-self: flex-start;
+  }
+  
+  .chat-input {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .chat-input input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+  }
+  
+  .chat-input button {
+    padding: 10px 20px;
+    border-radius: 20px;
+    background: #2196f3;
+    color: white;
+    border: none;
+    cursor: pointer;
+  }
+  

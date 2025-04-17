@@ -32,6 +32,8 @@ const LoginAdmin = () => {
       }
     } catch (err) {
       setError("❌ Invalid admin credentials.");
+      console.log(err.message); // Log the error message for debugging
+      
     }
   };
 
