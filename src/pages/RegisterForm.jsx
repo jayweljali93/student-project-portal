@@ -1,20 +1,22 @@
+// 
+
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createUserWithEmailAndPassword, getAuth, updateProfile } from "firebase/auth";
-import { db } from "../firebase"; // Adjust the import based on your project structure
-import { doc, setDoc } from "firebase/firestore";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase";
+import { getFirestore, setDoc, doc } from "firebase/firestore";
 import "../styles/RegisterForm.css";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
-  const auth = getAuth();
-
+  const db = getFirestore();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,33 +28,30 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+
     const { name, email, password, confirmPassword } = formData;
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      setError("Passwords do not match.");
       return;
     }
 
     try {
+      // Create user in Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Set display name in auth profile
-      await updateProfile(user, { displayName: name });
-
-      // Save user details in Firestore
+      // Save user info and role in Firestore
       await setDoc(doc(db, "users", user.uid), {
         name,
         email,
-        uid: user.uid,
-        role: "student", // or "admin" based on logic
+        role: "student", // You can customize this based on user selection
       });
 
-      // Navigate to login page
-      navigate("/");
-    } catch (error) {
-      console.error("Registration Error:", error.message);
-      alert(error.message);
+      navigate("/"); // redirect to login page after successful registration
+    } catch (err) {
+      setError("Registration failed. " + err.message);
     }
   };
 
@@ -83,6 +82,8 @@ const RegisterForm = () => {
         <button type="submit" className="submit-button">
           Register
         </button>
+
+        {error && <p className="error">{error}</p>}
 
         <p className="form-footer">
           Already have an account?{" "}
