@@ -1,9 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { createUserWithEmailAndPassword, getAuth, updateProfile } from "firebase/auth";
+import { db } from "../firebase"; // Adjust the import based on your project structure
+import { doc, setDoc } from "firebase/firestore";
 import "../styles/RegisterForm.css";
 
 const RegisterForm = () => {
   const navigate = useNavigate();
+  const auth = getAuth();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -19,10 +24,36 @@ const RegisterForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    // Add validation or API logic here
+    const { name, email, password, confirmPassword } = formData;
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      // Set display name in auth profile
+      await updateProfile(user, { displayName: name });
+
+      // Save user details in Firestore
+      await setDoc(doc(db, "users", user.uid), {
+        name,
+        email,
+        uid: user.uid,
+        role: "student", // or "admin" based on logic
+      });
+
+      // Navigate to login page
+      navigate("/");
+    } catch (error) {
+      console.error("Registration Error:", error.message);
+      alert(error.message);
+    }
   };
 
   return (
