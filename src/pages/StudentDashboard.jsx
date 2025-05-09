@@ -3,6 +3,7 @@ import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import StudentChatbox from '../components/StudentChatbox';
+import ProfileSection from '../pages/ProfileSection'; // ✅ Importing profile section
 import '../styles/Dashboard.css';
 
 const StudentDashboard = () => {
@@ -14,7 +15,7 @@ const StudentDashboard = () => {
   const [selectedProject, setSelectedProject] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
-  
+
   const projects = [
     {
       id: 1,
@@ -67,16 +68,12 @@ const StudentDashboard = () => {
       }
 
       try {
-        // Get user data from Firestore
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-
         if (userDoc.exists()) {
           const userData = userDoc.data();
           setUserName(userData.name || 'Student');
-
-          const userRole = userData.role;
-          if (userRole === 'admin') {
-            navigate('/admin-dashboard'); // Redirect to admin dashboard if role is admin
+          if (userData.role === 'admin') {
+            navigate('/admin-dashboard');
           }
         } else {
           console.log("User document not found.");
@@ -116,8 +113,6 @@ const StudentDashboard = () => {
   };
 
   const processPayment = () => {
-    // In a real app, this would integrate with a payment processor
-    // For now we're just simulating a successful payment
     setPaymentCompleted(true);
     setTimeout(() => {
       closePaymentModal();
@@ -126,29 +121,15 @@ const StudentDashboard = () => {
 
   const downloadFile = (e) => {
     e.stopPropagation();
-    
-    // Show payment modal if payment not completed
     if (!paymentCompleted) {
       showPayment(e);
       return;
     }
-    
-    // Handle file download (in a real app)
-    console.log(`Downloading ${selectedProject.fileName}`);
     alert(`Downloading ${selectedProject.fileName}`);
-    
-    // In a real app, you would trigger the download here
-    // For example:
-    // const link = document.createElement('a');
-    // link.href = `/api/download/${selectedProject.fileName}`;
-    // link.download = selectedProject.fileName;
-    // document.body.appendChild(link);
-    // link.click();
-    // document.body.removeChild(link);
   };
 
   const getFileIcon = (fileType) => {
-    switch(fileType) {
+    switch (fileType) {
       case 'pdf':
         return '📄';
       case 'zip':
@@ -161,7 +142,9 @@ const StudentDashboard = () => {
   return (
     <div className="dashboard-wrapper">
       <div className="sidebar">
+      <ProfileSection userName={userName} /> {/* ✅ Profile Section Inserted Here */}
         <h2>Student Portal</h2>
+        
         <ul>
           <li>Dashboard</li>
           <li>My Projects</li>
@@ -175,7 +158,7 @@ const StudentDashboard = () => {
       <div className="dashboard-content">
         <h1>Student Dashboard</h1>
         <p>Welcome, {userName}!</p>
-
+        
         <div className="cards">
           <div className="card">
             <h3>Upcoming Assignments</h3>
@@ -213,13 +196,10 @@ const StudentDashboard = () => {
                     <span className="file-size">{project.fileSize}</span>
                     <span className="file-price">{project.price}</span>
                   </div>
-                  <button 
-                    className="get-code-btn" 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      viewProjectDetails(project);
-                    }}
-                  >
+                  <button className="get-code-btn" onClick={(e) => {
+                    e.stopPropagation();
+                    viewProjectDetails(project);
+                  }}>
                     View Details
                   </button>
                 </div>
@@ -245,10 +225,7 @@ const StudentDashboard = () => {
                     <p><strong>Size:</strong> {selectedProject?.fileSize}</p>
                     <p><strong>Price:</strong> {selectedProject?.price}</p>
                   </div>
-                  <button 
-                    className="download-file-btn" 
-                    onClick={downloadFile}
-                  >
+                  <button className="download-file-btn" onClick={downloadFile}>
                     {paymentCompleted ? `Download ${selectedProject?.fileName}` : "Get File (Requires Payment)"}
                   </button>
                 </div>
@@ -291,7 +268,6 @@ const StudentDashboard = () => {
           </div>
         )}
 
-        {/* Payment Modal */}
         {showPaymentModal && (
           <div className="modal-overlay">
             <div className="payment-modal">
@@ -302,16 +278,12 @@ const StudentDashboard = () => {
               <div className="payment-content">
                 <h3>Purchase: {selectedProject?.name}</h3>
                 <p>Price: {selectedProject?.price}</p>
-                
                 <div className="qr-code">
                   <img src="/api/placeholder/200/200" alt="Payment QR Code" />
                 </div>
-                
                 <p className="payment-instructions">
                   Scan the QR code above with your payment app to complete the purchase.
                 </p>
-                
-                {/* This button simulates completing the payment process */}
                 <button className="complete-payment-btn" onClick={processPayment}>
                   {paymentCompleted ? "Payment Completed!" : "Simulate Payment"}
                 </button>
@@ -321,7 +293,6 @@ const StudentDashboard = () => {
         )}
       </div>
       <StudentChatbox currentStudent={{ name: userName, id: auth.currentUser.uid }} />
-
     </div>
   );
 };
