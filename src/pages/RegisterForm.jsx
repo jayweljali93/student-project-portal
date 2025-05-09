@@ -43,7 +43,7 @@ const RegisterForm = () => {
       const user = userCredential.user;
 
       // Save user info and role in Firestore
-      await setDoc(doc(db, "users", user.uid), {
+      await setDoc(doc(db, "students", user.uid), {
         name,
         email,
         role: "student", // You can customize this based on user selection
