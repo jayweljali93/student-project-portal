@@ -1,33 +1,33 @@
 /* AdminChat.css */
 .admin-chatbox {
-    position: relative;
-  }
-  
-  .chat-icon {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #4b67e0;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-  }
-  
-  .chat-icon:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-  }
-  
-  .chat-container {
+  position: relative;
+}
+
+.chat-icon {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #4b67e0;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.chat-icon:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.chat-container {
     display: flex;
     position: fixed;
     bottom: 100px;
@@ -40,202 +40,219 @@
     overflow: hidden;
     z-index: 1000;
   }
-  
-  /* Student List Styles */
-  .student-list {
-    width: 250px;
-    background: #233348;
-    color: white;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .list-header {
-    padding: 15px;
-    font-size: 18px;
-    font-weight: bold;
-    background: #1a2639;
-    border-bottom: 1px solid #314563;
-  }
-  
-  .no-students {
-    padding: 20px;
-    text-align: center;
-    color: #aaa;
-    font-style: italic;
-  }
-  
-  .student-item {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #314563;
-    transition: background 0.2s ease;
-  }
-  
-  .student-item:hover {
-    background: #314563;
-  }
-  
-  .student-item.selected {
-    background: #4b67e0;
-  }
-  
-  .student-item img {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 15px;
-    object-fit: cover;
-  }
-  
-  .student-info {
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .student-name {
-    font-weight: bold;
-  }
-  
-  .unread-badge {
-    background: #ff4757;
-    color: white;
-    border-radius: 50%;
-    min-width: 20px;
-    height: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 12px;
-    padding: 0 5px;
-  }
-  
-  /* Chat Window Styles */
-  .chat-window {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: #f5f6fa;
-  }
-  
-  .chat-header {
-    padding: 15px;
-    background: #4b67e0;
-    color: white;
-    display: flex;
-    align-items: center;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  }
-  
-  .chat-header .student-avatar {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    margin-right: 10px;
-  }
-  
-  .chat-header .student-name {
-    font-size: 16px;
-    font-weight: bold;
-  }
-  
-  .chat-body {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .no-messages {
-    text-align: center;
-    color: #777;
-    margin-top: 40%;
-    font-style: italic;
-  }
-  
-  .chat-msg {
-    margin: 8px 0;
-    max-width: 75%;
-    padding: 12px;
-    border-radius: 12px;
-    position: relative;
-    word-break: break-word;
-  }
-  
-  .chat-msg.student {
-    background: #e1f5fe;
-    color: #333;
-    align-self: flex-start;
-    border-bottom-left-radius: 4px;
-  }
-  
-  .chat-msg.admin {
-    background: #4b67e0;
-    color: white;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-  }
-  
-  .message-content {
-    margin-bottom: 4px;
-  }
-  
-  .timestamp {
-    font-size: 10px;
-    opacity: 0.7;
-    text-align: right;
-  }
-  
-  .chat-input {
-    display: flex;
-    padding: 15px;
-    background: #fff;
-    border-top: 1px solid #eee;
-  }
-  
-  .chat-input input {
-    flex: 1;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    outline: none;
-    font-size: 14px;
-  }
-  
-  .chat-input input:focus {
-    border-color: #4b67e0;
-  }
-  
-  .chat-input button {
-    background: #4b67e0;
-    border: none;
-    color: white;
-    padding: 0 20px;
-    border-radius: 4px;
-    margin-left: 10px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.2s ease;
-  }
-  
-  .chat-input button:hover {
-    background: #3954c3;
-  }
-  
-  .no-student {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .select-prompt {
-    color: #777;
-    text-align: center;
-    margin-top: 40%;
-    font-size: 16px;
-  }
+
+.chat-container {
+  display: flex;
+  position: fixed;
+  bottom: 92px;
+  right: 0px;
+  width: 800px;
+  /* height: 600px; */
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  z-index: 1000;
+}
+
+/* Student List Styles */
+.student-list- {
+  width: 250px;
+  background: #233348;
+  color: white;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.list-header {
+  padding: 14px;
+  font-size: 18px;
+  font-weight: bold;
+  background: #34445f;
+}
+
+.no-students {
+  padding: 20px;
+  text-align: center;
+  color: #aaa;
+  font-style: italic;
+}
+
+.student-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #314563;
+  transition: background 0.2s ease;
+}
+
+.student-item:hover {
+  background: #314563;
+}
+
+.student-item.selected {
+  background: #4b67e0;
+}
+
+.student-item img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 15px;
+  object-fit: cover;
+}
+
+.student-info {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: black;
+  font-size: 10px;
+}
+
+.student-name {
+  font-weight: bold;
+}
+
+.unread-badge {
+  background: #ff4757;
+  color: white;
+  border-radius: 50%;
+  min-width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  padding: 0 5px;
+}
+
+/* Chat Window Styles */
+.chat-window {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #f5f6fa;
+}
+
+.chat-header {
+  padding: 15px;
+  background: #4b67e0;
+  color: white;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.chat-header .student-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.chat-header .student-name {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.chat-body {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-messages {
+  text-align: center;
+  color: #777;
+  margin-top: 40%;
+  font-style: italic;
+}
+
+.chat-msg {
+  margin: 8px 0;
+  max-width: 75%;
+  padding: 12px;
+  border-radius: 12px;
+  position: relative;
+  word-break: break-word;
+}
+
+.chat-msg.student {
+  background: #e1f5fe;
+  color: #333;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+.chat-msg.admin {
+  background: #4b67e0;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.message-content {
+  margin-bottom: 4px;
+}
+
+.timestamp {
+  font-size: 10px;
+  opacity: 0.7;
+  text-align: right;
+}
+
+.chat-input {
+  display: flex;
+  padding: 15px;
+  background: #fff;
+  border-top: 1px solid #eee;
+}
+
+.chat-input input {
+  flex: 1;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+  font-size: 14px;
+}
+
+.chat-input input:focus {
+  border-color: #4b67e0;
+}
+
+.chat-input button {
+  background: #4b67e0;
+  border: none;
+  color: white;
+  padding: 0 20px;
+  border-radius: 4px;
+  margin-left: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.chat-input button:hover {
+  background: #3954c3;
+}
+
+.no-student {
+  display: flex;
+  flex-direction: column;
+}
+
+.select-prompt {
+  color: #777;
+  text-align: center;
+  margin-top: 40%;
+  font-size: 16px;
+}
+
+

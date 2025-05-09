@@ -1,65 +1,67 @@
 import React, { useEffect, useState } from 'react';
-import { getFirestore, collection, query, onSnapshot,doc, getDoc } from 'firebase/firestore';
+import {
+  getFirestore,
+  collection,
+  query,
+  onSnapshot,
+  getDoc,
+  doc,
+} from 'firebase/firestore';
 import './AdminChatbox.css';
 import { IdCard } from 'lucide-react';
 
 const StudentList = ({ onSelectStudent, selectedStudentId }) => {
   const db = getFirestore();
   const [students, setStudents] = useState([]);
+  
 
   useEffect(() => {
     const q = query(collection(db, 'messages'));
-  
+
     const unsubscribe = onSnapshot(q, async (snapshot) => {
       const studentIds = new Set();
-      const messagesMap = {};
-  
-      snapshot.docs.forEach(doc => {
-        const data = doc.data();
-        studentIds.add(data.studentId);
-  
-        if (data.sender === 'student' && !data.read) {
-          messagesMap[data.studentId] = (messagesMap[data.studentId] || 0) + 1;
+      const unreadMap = {};
+
+      snapshot.docs.forEach((docSnap) => {
+        const data = docSnap.data();
+        if (data.studentId) {
+          studentIds.add(data.studentId);
+        }
+
+        if (data.sender === 'student' && !data.read && data.studentId) {
+          unreadMap[data.studentId] = (unreadMap[data.studentId] || 0) + 1;
         }
       });
-  
-      // Fetch student details from 'users' collection
+
       const studentPromises = Array.from(studentIds).map(async (id) => {
         try {
-          const userDocRef = doc(db, 'users', id);
-          const userDoc = await getDoc(userDocRef);
-  
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
+          const studentDoc = await getDoc(doc(db, 'users', id)); // or 'students' if you saved there
+          if (studentDoc.exists()) {
+            const userData = studentDoc.data();
             return {
               id,
-              name: userData.name || `Student ${id}`,
-              avatar: userData.avatar || `https://via.placeholder.com/40`,
-              unreadCount: messagesMap[id] || 0,
+              name: userData.name || userData.email?.split('@')[0] || 'Unknown',
+              avatar: 'https://via.placeholder.com/40',
+              unreadCount: unreadMap[id] || 0,
             };
           } else {
             return {
               id,
-              name: `Unknown Student`,
-              avatar: `https://via.placeholder.com/40`,
-              unreadCount: messagesMap[id] || 0,
+              name: id,
+              avatar: 'https://via.placeholder.com/40',
+              unreadCount: unreadMap[id] || 0,
             };
           }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-          return {
-            id,
-            name: `Error Loading`,
-            avatar: `https://via.placeholder.com/40`,
-            unreadCount: messagesMap[id] || 0,
-          };
+        } catch (err) {
+          console.error('Error fetching student:', id, err);
+          return null;
         }
       });
-  
-      const studentsData = await Promise.all(studentPromises);
-      setStudents(studentsData);
+
+      const results = await Promise.all(studentPromises);
+      setStudents(results.filter((s) => s !== null));
     });
-  
+
     return () => unsubscribe();
   }, []);
   
@@ -70,13 +72,13 @@ const StudentList = ({ onSelectStudent, selectedStudentId }) => {
       {students.length === 0 ? (
         <div className="no-students">No student messages</div>
       ) : (
-        students.map(student => (
-          <div 
-            key={student.id} 
+        students.map((student) => (
+          <div
+            key={student.id}
             className={`student-item ${selectedStudentId === student.id ? 'selected' : ''}`}
             onClick={() => onSelectStudent(student)}
           >
-            <img src={student.avatar} alt={student.name} />
+            {/* <img src={student.avatar} alt={student.name} /> */}
             <div className="student-info">
               <div className="student-name">{student.name}</div>
               {student.unreadCount > 0 && (

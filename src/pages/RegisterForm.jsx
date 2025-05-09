@@ -37,45 +37,55 @@ const RegisterForm = () => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setError("");
 
-    const { name, email, password, confirmPassword, profilePic } = formData;
+  const { name, email, password, confirmPassword, profilePic } = formData;
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
+  if (password !== confirmPassword) {
+    setError("Passwords do not match.");
+    return;
+  }
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    let profilePicUrl = "";
+
+    if (profilePic) {
+      const storageRef = ref(storage, `profilePics/${user.uid}`);
+      await uploadBytes(storageRef, profilePic);
+      profilePicUrl = await getDownloadURL(storageRef);
     }
 
-    try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
+    // Update user profile in Firebase Auth
+    await updateProfile(user, {
+      displayName: name,
+      photoURL: profilePicUrl,
+    });
 
-      let profilePicUrl = "";
-      if (profilePic) {
-        const storageRef = ref(storage, `profilePics/${user.uid}`);
-        await uploadBytes(storageRef, profilePic);
-        profilePicUrl = await getDownloadURL(storageRef);
+    // Save user info and role in Firestore
+    await setDoc(doc(db, "students", user.uid), {
+      name,
+      email,
+      profilePic: profilePicUrl,
+    });
 
-        await updateProfile(user, {
-          displayName: name,
-          photoURL: profilePicUrl,
-        });
-      }
+    await setDoc(doc(db, "users", user.uid), {
+      name,
+      email,
+      role: "student",
+      profilePic: profilePicUrl,
+    });
 
-      await setDoc(doc(db, "users", user.uid), {
-        name,
-        email,
-        role: "student",
-        profilePic: profilePicUrl,
-      });
+    navigate("/");
+  } catch (err) {
+    setError("Registration failed. " + err.message);
+  }
+};
 
-      navigate("/");
-    } catch (err) {
-      setError("Registration failed. " + err.message);
-    }
-  };
 
   return (
     <div className="register-container">
