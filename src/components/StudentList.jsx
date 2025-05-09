@@ -8,6 +8,7 @@ import {
   doc,
 } from 'firebase/firestore';
 import './AdminChatbox.css';
+import { IdCard } from 'lucide-react';
 
 const StudentList = ({ onSelectStudent, selectedStudentId }) => {
   const db = getFirestore();
@@ -62,7 +63,8 @@ const StudentList = ({ onSelectStudent, selectedStudentId }) => {
     });
 
     return () => unsubscribe();
-  }, [db]);
+  }, []);
+  
 
   return (
     <div className="student-list">

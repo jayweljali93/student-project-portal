@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,AsyncStorage } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 import { auth } from "../firebase";
@@ -22,6 +22,7 @@ const LoginAdmin = () => {
 
       if (userDoc.exists()) {
         const role = userDoc.data().role;
+       localStorage.setItem("UserId", user.uid); // Store the role in AsyncStorage
         if (role === "admin") {
           navigate("/admin-dashboard");
         } else if (role === "student") {

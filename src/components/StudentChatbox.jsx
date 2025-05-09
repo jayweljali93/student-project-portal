@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { collection, addDoc, query, orderBy, where, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, query, orderBy, where, onSnapshot} from 'firebase/firestore';
 import './StudentChatbox.css';
 import { db, serverTimestamp } from '../firebase'; // This is correct now
 
@@ -22,22 +22,78 @@ const StudentChatbox = ({ currentStudent }) => {
     setMessage('');
   };
 
+  
   useEffect(() => {
-    if (!currentStudent || !currentStudent.id) return;
-
+    if (!currentStudent || !currentStudent.id) {
+      return;
+    }
+  
     const q = query(
       collection(db, 'messages'),
       where('studentId', '==', currentStudent.id),
-      orderBy('timestamp')
+       orderBy('timestamp') // This combo requires a composite index
     );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setMessages(msgs);
-    });
-
+  
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const msgs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setMessages(msgs);
+      },
+      (error) => {
+        // Detect and inform about the missing index
+        if (
+          error.code === 'failed-precondition' &&
+          error.message.includes('requires an index')
+        ) {
+          console.warn(
+            'Missing Firestore index. Please create it manually in the console.'
+          );
+          console.warn(
+            'Click the link from the error message in your browser console to create the required index.'
+          );
+        } else {
+          console.error('Error fetching messages:', error);
+        }
+      }
+    );
+  
     return () => unsubscribe();
-  }, [currentStudent]);
+  }, [currentStudent]); 
+
+
+
+
+  // useEffect(() => {
+  //   if (!currentStudent || !currentStudent.id) {
+  //     return;
+  //   }
+
+  //   const q = query(
+  //     collection(db, 'messages'),
+  //     where('studentId', '==', currentStudent.id),
+  //     orderBy('timestamp')
+  //   );
+
+  //   const unsubscribe = onSnapshot(q, (snapshot) => {
+  //     const msgs = snapshot.docs.map(docSnapshot => {
+  //       const data = docSnapshot.data();
+
+  //       // Mark unread student messages as read
+  //       if (data.sender === 'student' && !data.read) {
+  //         updateDoc(doc(db, 'messages', docSnapshot.id), { read: true });
+  //       }
+
+  //       return { id: docSnapshot.id, ...data };
+  //     });
+
+  //     setMessages(msgs);
+  //     // setTimeout(scrollToBottom, 100);
+  //   });
+
+  //   return () => unsubscribe();
+  // }, [currentStudent]);
+  
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') sendMessage();
