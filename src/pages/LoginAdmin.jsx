@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { doc, getFirestore, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
@@ -18,24 +18,18 @@ const LoginAdmin = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      const userRef = doc(db, "users", user.uid);
 
-      onSnapshot(userRef, (docSnap) => {
-        if (docSnap.exists()) {
-          const role = docSnap.data().role;
-          localStorage.setItem("UserId", user.uid);
-          if (role === "admin") {
-            navigate("/admin-dashboard");
-          } else if (role === "student") {
-            navigate("/student-dashboard");
-          } else {
-            setError("❌ You are not authorized as an admin.");
-          }
-        }
-      });
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+
+      if (userDoc.exists() && userDoc.data().role === "admin") {
+        localStorage.setItem("UserId", user.uid);
+        navigate("/admin-dashboard");
+      } else {
+        setError("❌ You are not authorized as an admin.");
+      }
     } catch (err) {
       setError("❌ Invalid admin credentials.");
-      console.log(err.message);
+      console.error("Login error:", err.message);
     }
   };
 
@@ -43,22 +37,22 @@ const LoginAdmin = () => {
     <div className="login-wrapper">
       <div className="login-left">
         <h2>Welcome Back</h2>
-        <p>Create your account.<br />It's totally free.</p>
-        <button className="signup-btn" onClick={() => navigate("/register")}>Sign Up</button>
+        <p>Only Admins allowed to login here.</p>
+        <button className="signup-btn" onClick={() => navigate("/register")}>Student Sign Up</button>
       </div>
 
       <div className="login-right">
-        <h3>Login</h3>
+        <h3>Admin Login</h3>
         <form onSubmit={handleLogin}>
-          <label>Username or email address<span className="required">*</span></label>
+          <label>Email *</label>
           <input
             type="email"
-            placeholder="Username or Email"
+            placeholder="Admin Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <label>Password<span className="required">*</span></label>
+          <label>Password *</label>
           <input
             type="password"
             placeholder="Password"

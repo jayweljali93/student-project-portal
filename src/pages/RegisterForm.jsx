@@ -37,60 +37,51 @@ const RegisterForm = () => {
     }
   };
 
- const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
 
-  const { name, email, password, confirmPassword, profilePic } = formData;
+    const { name, email, password, confirmPassword, profilePic } = formData;
 
-  if (password !== confirmPassword) {
-    setError("Passwords do not match.");
-    return;
-  }
-
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    let profilePicUrl = "";
-
-    if (profilePic) {
-      const storageRef = ref(storage, `profilePics/${user.uid}`);
-      await uploadBytes(storageRef, profilePic);
-      profilePicUrl = await getDownloadURL(storageRef);
+    if (password !== confirmPassword) {
+      setError("❌ Passwords do not match.");
+      return;
     }
 
-    // Update user profile in Firebase Auth
-    await updateProfile(user, {
-      displayName: name,
-      photoURL: profilePicUrl,
-    });
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    // Save user info and role in Firestore
-    await setDoc(doc(db, "students", user.uid), {
-      name,
-      email,
-      profilePic: profilePicUrl,
-    });
+      let profilePicUrl = "";
+      if (profilePic) {
+        const storageRef = ref(storage, `profilePics/${user.uid}`);
+        await uploadBytes(storageRef, profilePic);
+        profilePicUrl = await getDownloadURL(storageRef);
+      }
 
-    await setDoc(doc(db, "users", user.uid), {
-      name,
-      email,
-      role: "student",
-      profilePic: profilePicUrl,
-    });
+      await updateProfile(user, {
+        displayName: name,
+        photoURL: profilePicUrl,
+      });
 
-    navigate("/");
-  } catch (err) {
-    setError("Registration failed. " + err.message);
-  }
-};
+      // Save to 'users' collection with role: 'student'
+      await setDoc(doc(db, "users", user.uid), {
+        name,
+        email,
+        role: "student",
+        profilePic: profilePicUrl,
+      });
 
+      navigate("/student-dashboard");
+    } catch (err) {
+      setError("❌ Registration failed. " + err.message);
+    }
+  };
 
   return (
     <div className="register-container">
       <form onSubmit={handleSubmit} className="register-form">
-        <h2 className="form-title">Register</h2>
+        <h2 className="form-title">Student Register</h2>
 
         <div className="profile-pic-wrapper">
           <div className="profile-pic">
@@ -99,9 +90,7 @@ const RegisterForm = () => {
               alt="Profile Preview"
               className="profile-img"
             />
-            <label htmlFor="profilePicInput" className="camera-icon">
-              📷
-            </label>
+            <label htmlFor="profilePicInput" className="camera-icon">📷</label>
             <input
               id="profilePicInput"
               type="file"
@@ -116,10 +105,7 @@ const RegisterForm = () => {
         {["name", "email", "password", "confirmPassword"].map((field, idx) => (
           <div key={idx} className="form-group">
             <label className="form-label">
-              <span className="required">*</span>{" "}
-              {field === "confirmPassword"
-                ? "Confirm password"
-                : field.charAt(0).toUpperCase() + field.slice(1)}
+              {field === "confirmPassword" ? "Confirm Password" : field.charAt(0).toUpperCase() + field.slice(1)} *
             </label>
             <input
               type={field.includes("password") ? "password" : "text"}
@@ -132,17 +118,10 @@ const RegisterForm = () => {
           </div>
         ))}
 
-        <button type="submit" className="submit-button">
-          Register
-        </button>
-
+        <button type="submit" className="submit-button">Register</button>
         {error && <p className="error">{error}</p>}
-
         <p className="form-footer">
-          Already have an account?{" "}
-          <span className="login-link" onClick={() => navigate("/")}>
-            Login
-          </span>
+          Already have an account? <span className="login-link" onClick={() => navigate("/")}>Login</span>
         </p>
       </form>
     </div>
