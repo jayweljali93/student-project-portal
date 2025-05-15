@@ -3,56 +3,59 @@ import { getAuth, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import StudentChatbox from '../components/StudentChatbox';
-import ProfileSection from '../pages/ProfileSection';
+import ProfileSection from './ProfileSection';
 import '../styles/Dashboard.css';
 
 const StudentDashboard = () => {
   const navigate = useNavigate();
   const auth = getAuth();
   const db = getFirestore();
+  const user = auth.currentUser;
+  
   const [userName, setUserName] = useState('');
-  const [projects, setProjects] = useState([]); // State to hold fetched projects
+  const [projects, setProjects] = useState([]);
   const [showProjectDetails, setShowProjectDetails] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
-  const [loadingProjects, setLoadingProjects] = useState(true); // To handle loading state
-  const [errorLoadingProjects, setErrorLoadingProjects] = useState(null); // To handle errors
+  const [loadingProjects, setLoadingProjects] = useState(true);
+  const [errorLoadingProjects, setErrorLoadingProjects] = useState(null);
 
+  // Role-based protection
   useEffect(() => {
     const checkRole = async () => {
-      const user = auth.currentUser;
-      if (!user) {
-        navigate('/');
-        return;
-      }
+      if (!user || !user.uid) return;
 
       try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUserName(userData.name || 'Student');
-          if (userData.role === 'admin') {
-            navigate('/admin-dashboard');
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          if (data.role !== "student") {
+            navigate("/unauthorized");
+          } else {
+            setUserName(data.name || 'Student');
           }
         } else {
-          console.log("User document not found.");
+          console.error("No such document!");
         }
       } catch (error) {
-        console.log("Error fetching user role:", error);
+        console.error("Error checking role:", error);
       }
     };
-    checkRole();
 
-    // Function to fetch projects from your API
+    checkRole();
+  }, [user, db, navigate]);
+
+  // Fetch projects
+  useEffect(() => {
     const fetchProjects = async () => {
       setLoadingProjects(true);
       setErrorLoadingProjects(null);
       try {
-        const response = await fetch('https://upload-5v3q.onrender.com/projects'); // Replace with your actual API URL
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        const response = await fetch('https://upload-5v3q.onrender.com/projects');
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setProjects(data);
       } catch (error) {
@@ -63,15 +66,13 @@ const StudentDashboard = () => {
       }
     };
 
-    fetchProjects(); // Call the fetchProjects function when the component mounts
-  }, [auth, db, navigate]);
+    fetchProjects();
+  }, []);
 
   const handleLogout = () => {
-    signOut(auth).then(() => {
-      navigate('/');
-    }).catch((error) => {
-      console.log("Logout error:", error);
-    });
+    signOut(auth)
+      .then(() => navigate('/'))
+      .catch((error) => console.log("Logout error:", error));
   };
 
   const viewProjectDetails = (project) => {
@@ -95,46 +96,29 @@ const StudentDashboard = () => {
 
   const processPayment = () => {
     setPaymentCompleted(true);
-    setTimeout(() => {
-      closePaymentModal();
-    }, 1000);
+    setTimeout(() => closePaymentModal(), 1000);
   };
 
   const downloadFile = (e) => {
     e.stopPropagation();
-    if (!selectedProject) {
-      console.error("No project selected for download.");
-      return;
-    }
-
+    if (!selectedProject) return console.error("No project selected.");
     if (!paymentCompleted && selectedProject?.price !== "$0.00") {
       showPayment(e);
       return;
     }
 
-    const fileId = selectedProject.fileId; // Assuming your project object has '_id' which maps to the file ID on the backend
-
-    if (!fileId) {
-      console.error("Project has no file ID for download.");
-      return;
-    }
-console.log(`Downloading file with ID: ${fileId}`);
-    // Construct the download URL from your backend
+    const fileId = selectedProject.fileId;
+    if (!fileId) return console.error("No file ID provided.");
+    
     const downloadUrl = `https://upload-5v3q.onrender.com/download/${fileId}`;
-
-    // Programmatically trigger the download
     window.open(downloadUrl, '_blank');
-    console.log(`Initiating download from: ${downloadUrl}`);
   };
 
   const getFileIcon = (fileType) => {
     switch (fileType) {
-      case 'pdf':
-        return '📄';
-      case 'zip':
-        return '📦';
-      default:
-        return '📁';
+      case 'pdf': return '📄';
+      case 'zip': return '📦';
+      default: return '📁';
     }
   };
 
@@ -190,17 +174,16 @@ console.log(`Downloading file with ID: ${fileId}`);
               {projects.map(project => (
                 <div key={project._id} className="project-card" onClick={() => viewProjectDetails(project)}>
                   <div className="project-screenshot">
-                    <img src={`/api/placeholder/600/400?text=${project.title}`} alt={project.title} /> {/* Dynamic placeholder */}
+                    <img src={`/api/placeholder/600/400?text=${project.title}`} alt={project.title} />
                     <div className="file-badge">
                       <span className="file-icon">{getFileIcon(project.fileType)}</span>
-                      <span className="file-type">{project.fileType?.toUpperCase()}</span> {/* Handle potential undefined */}
+                      <span className="file-type">{project.fileType?.toUpperCase()}</span>
                     </div>
                   </div>
                   <h3>{project.title}</h3>
                   <p>{project.description}</p>
                   <div className="file-info">
-                    {/* <span className="file-size">{project.fileSize || 'N/A'}</span> Handle potential undefined */}
-                    <span className="file-price">{project.price || 'Free'}</span> {/* Handle potential undefined */}
+                    <span className="file-price">{project.price || 'Free'}</span>
                   </div>
                   <button className="get-code-btn" onClick={(e) => {
                     e.stopPropagation();
@@ -228,11 +211,12 @@ console.log(`Downloading file with ID: ${fileId}`);
                   </div>
                   <div className="file-info-details">
                     <p><strong>File Name:</strong> {selectedProject?.title || 'N/A'}</p>
-
                     <p><strong>Price:</strong> {selectedProject?.price || 'Free'}</p>
                   </div>
                   <button className="download-file-btn" onClick={downloadFile}>
-                    {paymentCompleted || selectedProject?.price === "$0.00" ? `Download ${selectedProject?.title}` : "Get File (Requires Payment)"}
+                    {paymentCompleted || selectedProject?.price === "$0.00"
+                      ? `Download ${selectedProject?.title}`
+                      : "Get File (Requires Payment)"}
                   </button>
                 </div>
               </div>
@@ -298,7 +282,8 @@ console.log(`Downloading file with ID: ${fileId}`);
           </div>
         )}
       </div>
-      <StudentChatbox currentStudent={{ name: userName, id: auth.currentUser.uid }} />
+
+      <StudentChatbox currentStudent={{ name: userName, id: auth.currentUser?.uid }} />
     </div>
   );
 };

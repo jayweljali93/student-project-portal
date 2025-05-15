@@ -63,7 +63,7 @@ const StudentList = ({ onSelectStudent, selectedStudentId }) => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, );
   
 
   return (
