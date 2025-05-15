@@ -1,0 +1,73 @@
+.project-upload-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: 30px;
+  margin: 40px auto;
+  max-width: 500px;
+  width: 90%;
+  box-sizing: border-box;
+  transition: all 0.3s ease-in-out;
+}
+
+.project-upload-card h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+  color: #1f2937;
+  text-align: center;
+}
+
+.upload-subtitle {
+  margin-bottom: 25px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.project-upload-card input[type="text"],
+.project-upload-card input[type="number"],
+.project-upload-card textarea,
+.project-upload-card input[type="file"] {
+  width: 100%;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: #f9fafb;
+  transition: border 0.2s;
+}
+
+.project-upload-card input:focus,
+.project-upload-card textarea:focus {
+  border-color: #3b82f6;
+  outline: none;
+  background-color: #fff;
+}
+
+.upload-btn {
+  width: 100%;
+  background-color: #3b82f6;
+  color: white;
+  font-size: 16px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.upload-btn:hover {
+  background-color: #2563eb;
+}
+
+.upload-btn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.upload-message {
+  text-align: center;
+  margin-top: 20px;
+  font-weight: 500;
+  color: green;
+}

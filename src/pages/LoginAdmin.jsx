@@ -1,6 +1,6 @@
-import React, { useState,AsyncStorage } from "react";
+import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
+import { doc, getFirestore, onSnapshot } from "firebase/firestore";
 import { auth } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import "../styles/Login.css";
@@ -18,23 +18,24 @@ const LoginAdmin = () => {
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      const userDoc = await getDoc(doc(db, "users", user.uid));
+      const userRef = doc(db, "users", user.uid);
 
-      if (userDoc.exists()) {
-        const role = userDoc.data().role;
-       localStorage.setItem("UserId", user.uid); // Store the role in AsyncStorage
-        if (role === "admin") {
-          navigate("/admin-dashboard");
-        } else if (role === "student") {
-          navigate("/student-dashboard");
-        } else {
-          setError("❌ You are not authorized as an admin.");
+      onSnapshot(userRef, (docSnap) => {
+        if (docSnap.exists()) {
+          const role = docSnap.data().role;
+          localStorage.setItem("UserId", user.uid);
+          if (role === "admin") {
+            navigate("/admin-dashboard");
+          } else if (role === "student") {
+            navigate("/student-dashboard");
+          } else {
+            setError("❌ You are not authorized as an admin.");
+          }
         }
-      }
+      });
     } catch (err) {
       setError("❌ Invalid admin credentials.");
-      console.log(err.message); // Log the error message for debugging
-      
+      console.log(err.message);
     }
   };
 
@@ -65,7 +66,7 @@ const LoginAdmin = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="signin-btn">Sing In</button>
+          <button type="submit" className="signin-btn">Sign In</button>
         </form>
         <div className="forgot-password">
           <a href="#" onClick={() => navigate("/reset-password")}>Forgot Password?</a>
