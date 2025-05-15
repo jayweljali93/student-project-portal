@@ -32,43 +32,65 @@ const AdminDashboard = () => {
   const [loadingProjects, setLoadingProjects] = useState(false);
   const [errorProjects, setErrorProjects] = useState(null);
 
-  useEffect(() => {
-    const fetchAdminInfo = async () => {
-      const user = auth.currentUser;
-      if (!user) return navigate("/admin-login");
+  // Fetch admin info
+  const fetchAdminInfo = async () => {
+    const user = auth.currentUser;
+    if (!user) return navigate("/admin-login");
 
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        setAdminName(userData.name || "Admin");
-        if (userData.role !== "admin") navigate("/student-dashboard");
-      }
-    };
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    if (userDoc.exists()) {
+      const userData = userDoc.data();
+      setAdminName(userData.name || "Admin");
+      if (userData.role !== "admin") navigate("/student-dashboard");
+    }
+  };
 
-    const fetchUploadedProjects = () => {
-      setLoadingProjects(true);
-      setErrorProjects(null);
-      try {
-        const user = auth.currentUser;
-        if (user) {
-          const projectsRef = collection(db, "projects");
-          const q = query(projectsRef, where("uploadedBy", "==", user.uid));
-          const unsubscribe = onSnapshot(q, (snapshot) => {
-            const projectsData = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(),
-            }));
-            setUploadedProjects(projectsData);
-            setLoadingProjects(false);
-          });
-          return () => unsubscribe();
-        }
-      } catch (error) {
+  // Fetch list of students
+  const fetchStudentList = async () => {
+    const snapshot = await getDocs(collection(db, "users"));
+    const studentList = snapshot.docs
+      .map((doc) => ({ id: doc.id, ...doc.data() }))
+      .filter((user) => user.role === "student");
+    setStudents(studentList);
+  };
+
+  // Fetch projects uploaded by admin
+  const fetchUploadedProjects = () => {
+    setLoadingProjects(true);
+    setErrorProjects(null);
+
+    const user = auth.currentUser;
+    if (!user) {
+      setErrorProjects("User not authenticated.");
+      setLoadingProjects(false);
+      return;
+    }
+
+    const projectsRef = collection(db, "projects");
+    const q = query(projectsRef, where("uploadedBy", "==", user.uid));
+
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const projectsData = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setUploadedProjects(projectsData);
+        setLoadingProjects(false);
+      },
+      (error) => {
+        console.error("Error fetching projects:", error);
         setErrorProjects(error.message || "Failed to fetch projects.");
         setLoadingProjects(false);
       }
-    };
+    );
 
+    return unsubscribe;
+  };
+
+  // useEffect to load data on mount
+  useEffect(() => {
     fetchAdminInfo();
     fetchStudentList();
     const unsubscribeProjects = fetchUploadedProjects();
@@ -79,14 +101,6 @@ const AdminDashboard = () => {
       }
     };
   }, []);
-
-  const fetchStudentList = async () => {
-    const snapshot = await getDocs(collection(db, "users"));
-    const studentList = snapshot.docs
-      .map((doc) => ({ id: doc.id, ...doc.data() }))
-      .filter((user) => user.role === "student");
-    setStudents(studentList);
-  };
 
   const handleLogout = () => {
     signOut(auth)
@@ -161,7 +175,6 @@ const AdminDashboard = () => {
             <div className="project-header">
               <h2>Projects</h2>
               <Projects />
-              
             </div>
             {loadingProjects && <p>Loading projects...</p>}
             {errorProjects && (
@@ -173,7 +186,6 @@ const AdminDashboard = () => {
 
             {!loadingProjects && !errorProjects && (
               <Table striped bordered hover>
-             
                 <tbody>
                   {uploadedProjects.length > 0 ? (
                     uploadedProjects.map((project) => (
@@ -198,6 +210,7 @@ const AdminDashboard = () => {
                     ))
                   ) : (
                     <tr>
+                      <td colSpan="4">No projects uploaded.</td>
                     </tr>
                   )}
                 </tbody>

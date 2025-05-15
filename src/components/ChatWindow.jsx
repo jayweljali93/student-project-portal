@@ -25,32 +25,35 @@ const ChatWindow = ({ student }) => {
   };
 
   useEffect(() => {
-    if (!student) return;
+  if (!student) return;
 
-    const q = query(
-      collection(db, 'messages'),
-      where('studentId', '==', student.id),
-      orderBy('timestamp')
-    );
+  const q = query(
+    collection(db, 'messages'),
+    where('studentId', '==', student.id),
+    orderBy('timestamp')
+  );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+  const unsubscribe = onSnapshot(
+    q,
+    (snapshot) => {
       const msgs = snapshot.docs.map(docSnapshot => {
         const data = docSnapshot.data();
-
-        // Mark unread student messages as read
         if (data.sender === 'student' && !data.read) {
           updateDoc(doc(db, 'messages', docSnapshot.id), { read: true });
         }
-
         return { id: docSnapshot.id, ...data };
       });
-
       setMessages(msgs);
       setTimeout(scrollToBottom, 100);
-    });
+    },
+    (error) => {
+      console.error("Error in chat message listener:", error);
+      // Optionally display an error message to the user
+    }
+  );
 
-    return () => unsubscribe();
-  }, [student]);
+  return () => unsubscribe();
+}, [student]);
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') sendMessage();

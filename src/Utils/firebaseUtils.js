@@ -1,4 +1,3 @@
-// firebaseUtils.js
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
@@ -10,42 +9,45 @@ import {
   onSnapshot,
   updateDoc,
   doc,
-  serverTimestamp as _serverTimestamp
+  serverTimestamp as _serverTimestamp,
 } from "firebase/firestore";
 
-// Your Firebase config object
+// ✅ Firebase Config
 const firebaseConfig = {
-    apiKey: "AIzaSyBq6gL4vAVcDsVGrMn8p6i92YZiBtUmcyU",
-    authDomain: "student-project-portal.firebaseapp.com",
-    projectId: "student-project-portal",
-    storageBucket: "student-project-portal.firebasestorage.app",
-    messagingSenderId: "75846071853",
-    appId: "1:75846071853:web:eda12a126252632ca96aa4",
-  };
+  apiKey: "AIzaSyBq6gL4vAVcDsVGrMn8p6i92YZiBtUmcyU",
+  authDomain: "student-project-portal.firebaseapp.com",
+  projectId: "student-project-portal",
+  storageBucket: "student-project-portal.appspot.com",
+  messagingSenderId: "75846071853",
+  appId: "1:75846071853:web:eda12a126252632ca96aa4",
+};
 
-// Initialize Firebase app
+// ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Firestore instance
+// ✅ Firestore instance
 const db = getFirestore(app);
 
-// Export Firestore instance and timestamp
-export { db, _serverTimestamp as serverTimestamp };
+// ✅ Correct timestamp function
+export const serverTimestamp = () => _serverTimestamp();
 
-// Send message to Firebase
+// ✅ Export db
+export { db };
+
+// ✅ Send message
 export const sendMessageToFirebase = async ({ studentId, sender, message }) => {
-  if (!message.trim()) return;
+  if (!message || !message.trim()) return;
 
   await addDoc(collection(db, "messages"), {
     studentId,
     sender,
     message,
-    timestamp: _serverTimestamp(),
-    read: sender === "admin" ? true : false
+    timestamp: serverTimestamp(),
+    read: sender === "admin" ? true : false,
   });
 };
 
-// Listen to messages in real-time
+// ✅ Listen to messages
 export const listenToMessages = (studentId, callback) => {
   const q = query(
     collection(db, "messages"),
@@ -54,11 +56,14 @@ export const listenToMessages = (studentId, callback) => {
   );
 
   return onSnapshot(q, (snapshot) => {
-    const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const messages = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
     callback(messages);
 
-    // Mark unread messages as read (if viewed by admin)
-    snapshot.docs.forEach(docSnap => {
+    // Mark messages read
+    snapshot.docs.forEach((docSnap) => {
       const data = docSnap.data();
       if (data.sender === "student" && !data.read) {
         updateDoc(doc(db, "messages", docSnap.id), { read: true });
